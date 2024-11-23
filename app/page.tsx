@@ -10,9 +10,9 @@ import { Loader, Plus, Share } from 'lucide-react';
 
 function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState<number | null>(null);
-  const [subscription, setSubscription] = useState<PushSubscription | null>(
-    null
-  );
+  const [subscription, setSubscription] = useState<
+    PushSubscription | null | undefined
+  >(undefined);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -126,10 +126,15 @@ function PushNotificationManager() {
             <Button onClick={sendTestNotification}>Send</Button>
           </div>
         </>
-      ) : (
+      ) : subscription === null ? (
         <>
           <p>You are not subscribed to push notifications.</p>
           <Button onClick={subscribeToPush}>Subscribe</Button>
+        </>
+      ) : (
+        <>
+          <Loader />
+          <p>Fetching subscription...</p>
         </>
       )}
     </div>
@@ -140,7 +145,7 @@ export default function Page() {
   return (
     <div className={`p-4 flex flex-col items-center`}>
       <h1 className="text-3xl font-bold mb-3">Web Push</h1>
-      <Suspense fallback={'...'}>
+      <Suspense>
         <OpenedFromNotification />
       </Suspense>
       <PushNotificationManager />

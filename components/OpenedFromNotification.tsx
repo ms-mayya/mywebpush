@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 export default function OpenedFromNotification() {
   const searchParams = useSearchParams();
-  const isFromNotification = searchParams.get('from') === 'notification';
+  const isFromNotification = searchParams.has('success');
 
   useEffect(() => {
     if (isFromNotification) {
