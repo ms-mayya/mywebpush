@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
@@ -7,13 +8,31 @@ import { Input } from '@/components/ui/input';
 import OpenedFromNotification from '@/components/OpenedFromNotification';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader, Plus, Share } from 'lucide-react';
+import { toast } from 'sonner';
 
 function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState<number | null>(null);
   const [subscription, setSubscription] = useState<
     PushSubscription | null | undefined
   >(undefined);
+  const [isBusy, setIsIsBusy] = useState(false);
   const [message, setMessage] = useState('');
+
+  const runWithErrorHandling = async (
+    job: (...args: any[]) => Promise<any>,
+    ...args: any[]
+  ) => {
+    try {
+      setIsIsBusy(true);
+      const result = job(...args);
+      return 'then' in result ? await result : result;
+    } catch (e: any) {
+      toast.error(e.message || 'An error occurred');
+      throw e;
+    } finally {
+      setIsIsBusy(false);
+    }
+  };
 
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -41,38 +60,47 @@ function PushNotificationManager() {
   }
 
   async function subscribeToPush() {
-    const registration = await navigator.serviceWorker.ready;
-    const pushManager = registration.pushManager;
-    const sub = await pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    runWithErrorHandling(async () => {
+      const registration = await navigator.serviceWorker.ready;
+      const pushManager = registration.pushManager;
+      const sub = await pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+      });
+      setSubscription(sub);
+      await subscribeUser(sub);
     });
-    setSubscription(sub);
-    await subscribeUser(sub);
   }
 
   async function unsubscribeFromPush() {
-    await subscription?.unsubscribe();
-    setSubscription(null);
-    await unsubscribeUser(subscription!);
+    runWithErrorHandling(async () => {
+      await subscription!.unsubscribe();
+      await unsubscribeUser(subscription!);
+      setSubscription(null);
+    });
   }
 
-  async function sendTestNotification() {
-    if (subscription) {
+  async function sendClientNotification() {
+    runWithErrorHandling(async () => {
       const notification = {
         title: 'Test Notification',
         body: message,
         icon: '/android-chrome-192x192.png',
         badge: '/android-chrome-72x72.png',
+        vibrate: [100, 50, 100],
+        data: {
+          dateOfArrival: Date.now(),
+          primaryKey: '2',
+        },
       };
       const registration = await navigator.serviceWorker.ready;
       await registration.showNotification(
-        'Client: ' + notification.title,
+        '【Client】' + notification.title,
         notification
       );
       await sendNotification(notification);
       setMessage('');
-    }
+    });
   }
 
   if (isSupported == null) {
@@ -111,7 +139,11 @@ function PushNotificationManager() {
         <>
           <div className="mb-3">
             <p>You are subscribed to push notifications.</p>
-            <Button variant={'destructive'} onClick={unsubscribeFromPush}>
+            <Button
+              variant={'destructive'}
+              disabled={isBusy}
+              onClick={unsubscribeFromPush}
+            >
               Unsubscribe
             </Button>
           </div>
@@ -123,13 +155,17 @@ function PushNotificationManager() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button onClick={sendTestNotification}>Send</Button>
+            <Button disabled={isBusy} onClick={sendClientNotification}>
+              Send
+            </Button>
           </div>
         </>
       ) : subscription === null ? (
         <>
           <p>You are not subscribed to push notifications.</p>
-          <Button onClick={subscribeToPush}>Subscribe</Button>
+          <Button disabled={isBusy} onClick={subscribeToPush}>
+            Subscribe
+          </Button>
         </>
       ) : (
         <>

@@ -44,7 +44,7 @@ export async function sendNotification(
           subscription,
           JSON.stringify({
             ...notification,
-            title: 'Server: ' + notification.title,
+            title: '【Server】' + notification.title,
           })
         );
       } catch (e) {
