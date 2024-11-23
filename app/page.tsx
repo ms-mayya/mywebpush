@@ -31,7 +31,8 @@ function PushNotificationManager() {
 
   async function subscribeToPush() {
     const registration = await navigator.serviceWorker.ready;
-    const sub = await registration.pushManager.subscribe({
+    const pushManager = registration.pushManager;
+    const sub = await pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
     });

@@ -8,7 +8,7 @@ import {
 import webpush from 'web-push';
 
 webpush.setVapidDetails(
-  'https://mywebpush.vercel.app',
+  'https://mywebpush.vercel.app/',
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!
 );
