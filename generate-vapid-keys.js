@@ -1,4 +1,3 @@
-const { generateVAPIDKeys } = require('web-push');
 const webpush = require('web-push');
 const vapidKeys = webpush.generateVAPIDKeys();
 
