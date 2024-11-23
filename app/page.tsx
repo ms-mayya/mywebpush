@@ -48,7 +48,18 @@ function PushNotificationManager() {
 
   async function sendTestNotification() {
     if (subscription) {
-      await sendNotification(message);
+      const notification = {
+        title: 'Test Notification',
+        body: message,
+        icon: '/android-chrome-192x192.png',
+        badge: '/android-chrome-72x72.png',
+      };
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(
+        'Client: ' + notification.title,
+        notification
+      );
+      await sendNotification(notification);
       setMessage('');
     }
   }

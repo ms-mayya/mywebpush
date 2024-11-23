@@ -28,7 +28,9 @@ export async function unsubscribeUser(sub: PushSubscription) {
   return { success: true };
 }
 
-export async function sendNotification(message: string) {
+export async function sendNotification(
+  notification: NotificationOptions & { title: string }
+) {
   const subscriptions = await getAllSubscriptions();
   if (subscriptions.length < 1) {
     throw new Error('No subscription available');
@@ -36,18 +38,14 @@ export async function sendNotification(message: string) {
 
   try {
     for (const subscription of subscriptions) {
-      webpush
-        .sendNotification(
-          // @ts-expect-error nope
-          subscription,
-          JSON.stringify({
-            title: 'Test Notification',
-            body: message,
-            icon: '/android-chrome-192x192.png',
-            badge: '/android-chrome-72x72.png',
-          })
-        )
-        .catch(console.log);
+      await webpush.sendNotification(
+        // @ts-expect-error nope
+        subscription,
+        JSON.stringify({
+          ...notification,
+          title: 'Server: ' + notification.title,
+        })
+      );
     }
     return { success: true };
   } catch (error) {
