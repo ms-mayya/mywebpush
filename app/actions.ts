@@ -38,14 +38,19 @@ export async function sendNotification(
 
   try {
     for (const subscription of subscriptions) {
-      await webpush.sendNotification(
-        // @ts-expect-error nope
-        subscription,
-        JSON.stringify({
-          ...notification,
-          title: 'Server: ' + notification.title,
-        })
-      );
+      try {
+        await webpush.sendNotification(
+          // @ts-expect-error nope
+          subscription,
+          JSON.stringify({
+            ...notification,
+            title: 'Server: ' + notification.title,
+          })
+        );
+      } catch (e) {
+        console.error('Error sending push notification:', e);
+        await deleteSubscription(subscription);
+      }
     }
     return { success: true };
   } catch (error) {
