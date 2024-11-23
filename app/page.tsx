@@ -5,18 +5,29 @@ import { subscribeUser, unsubscribeUser, sendNotification } from './actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import OpenedFromNotification from '@/components/OpenedFromNotification';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Loader, Plus, Share } from 'lucide-react';
 
 function PushNotificationManager() {
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported, setIsSupported] = useState<number | null>(null);
   const [subscription, setSubscription] = useState<PushSubscription | null>(
     null
   );
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      setIsSupported(true);
-      registerServiceWorker();
+    if ('serviceWorker' in navigator) {
+      if ('PushManager' in window) {
+        setIsSupported(2);
+        registerServiceWorker();
+      } else if (
+        !navigator.standalone ||
+        !matchMedia('(display-mode: standalone)').matches
+      ) {
+        setIsSupported(1);
+      } else {
+        setIsSupported(0);
+      }
     }
   }, []);
 
@@ -64,19 +75,42 @@ function PushNotificationManager() {
     }
   }
 
-  if (!isSupported) {
-    return <p>Push notifications are not supported in this browser.</p>;
+  if (isSupported == null) {
+    return <Loader className="animate-spin" />;
+  }
+
+  if (isSupported === 0) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Push notifications are not supported in this browser.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (isSupported === 1) {
+    return (
+      <Alert variant="destructive">
+        <AlertTitle>Add to Home Screen</AlertTitle>
+        <AlertDescription>
+          <p>
+            To install this app on your iOS device, tap the share button
+            <Share className="mx-1 inline" />
+            and then &quot;Add to Home Screen&quot;
+            <Plus className="mx-1 inline" />.
+          </p>
+        </AlertDescription>
+      </Alert>
+    );
   }
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">Push Notifications</h3>
       {subscription ? (
         <>
           <div className="mb-3">
-            <p className="text-muted-foreground">
-              You are subscribed to push notifications.
-            </p>
+            <p>You are subscribed to push notifications.</p>
             <Button variant={'destructive'} onClick={unsubscribeFromPush}>
               Unsubscribe
             </Button>
@@ -89,7 +123,7 @@ function PushNotificationManager() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
             />
-            <Button onClick={sendTestNotification}>Send Test</Button>
+            <Button onClick={sendTestNotification}>Send</Button>
           </div>
         </>
       ) : (
@@ -102,54 +136,14 @@ function PushNotificationManager() {
   );
 }
 
-function InstallPrompt() {
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-
-  useEffect(() => {
-    setIsIOS(
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !('MSStream' in window)
-    );
-    setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
-  }, []);
-
-  if (isStandalone) {
-    return null; // Don't show install button if already installed
-  }
-
-  return (
-    <div>
-      <h3 className="text-2xl font-bold">Install App</h3>
-      <p>Add to Home Screen</p>
-      {isIOS && (
-        <p>
-          To install this app on your iOS device, tap the share button
-          <span role="img" aria-label="share icon">
-            {' '}
-            ⎋{' '}
-          </span>
-          and then &quot;Add to Home Screen&quot;
-          <span role="img" aria-label="plus icon">
-            {' '}
-            ➕{' '}
-          </span>
-          .
-        </p>
-      )}
-    </div>
-  );
-}
-
 export default function Page() {
   return (
     <div className={`p-4 flex flex-col items-center`}>
+      <h1 className="text-3xl font-bold mb-3">Web Push</h1>
       <Suspense fallback={'...'}>
         <OpenedFromNotification />
       </Suspense>
-      <div className="space-y-8">
-        <PushNotificationManager />
-        <InstallPrompt />
-      </div>
+      <PushNotificationManager />
     </div>
   );
 }
