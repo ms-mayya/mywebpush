@@ -133,8 +133,7 @@ function PushNotificationManager() {
         </>
       ) : (
         <>
-          <Loader />
-          <p>Fetching subscription...</p>
+          <Loader className="animate-spin text-green-600" />
         </>
       )}
     </div>
