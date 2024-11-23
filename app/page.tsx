@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { subscribeUser, unsubscribeUser, sendNotification } from './actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
+import OpenedFromNotification from '@/components/OpenedFromNotification';
 
 function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState(false);
@@ -62,17 +61,24 @@ function PushNotificationManager() {
       <h3 className="text-2xl font-bold">Push Notifications</h3>
       {subscription ? (
         <>
-          <p>You are subscribed to push notifications.</p>
-          <Button variant={'destructive'} onClick={unsubscribeFromPush}>
-            Unsubscribe
-          </Button>
-          <Input
-            type="text"
-            placeholder="Enter notification message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-          />
-          <Button onClick={sendTestNotification}>Send Test</Button>
+          <div className="mb-3">
+            <p className="text-muted-foreground">
+              You are subscribed to push notifications.
+            </p>
+            <Button variant={'destructive'} onClick={unsubscribeFromPush}>
+              Unsubscribe
+            </Button>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Input
+              type="text"
+              className="my-1"
+              placeholder="Enter notification message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <Button onClick={sendTestNotification}>Send Test</Button>
+          </div>
         </>
       ) : (
         <>
@@ -102,7 +108,7 @@ function InstallPrompt() {
   return (
     <div>
       <h3 className="text-2xl font-bold">Install App</h3>
-      <Button>Add to Home Screen</Button>
+      <p>Add to Home Screen</p>
       {isIOS && (
         <p>
           To install this app on your iOS device, tap the share button
@@ -123,20 +129,15 @@ function InstallPrompt() {
 }
 
 export default function Page() {
-  const isFromNotification = useSearchParams().get('from') === 'notification';
-
-  useEffect(() => {
-    if (isFromNotification) {
-      setTimeout(() => {
-        toast.success('Opened from notification');
-      }, 1000);
-    }
-  }, [isFromNotification]);
-
   return (
-    <div className={`p-4 space-y-8}`}>
-      <PushNotificationManager />
-      <InstallPrompt />
+    <div className={`p-4 flex flex-col items-center`}>
+      <Suspense fallback={'...'}>
+        <OpenedFromNotification />
+      </Suspense>
+      <div className="space-y-8">
+        <PushNotificationManager />
+        <InstallPrompt />
+      </div>
     </div>
   );
 }

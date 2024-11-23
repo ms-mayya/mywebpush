@@ -38,6 +38,7 @@ export async function sendNotification(message: string) {
     for (const subscription of subscriptions) {
       webpush
         .sendNotification(
+          // @ts-expect-error nope
           subscription,
           JSON.stringify({
             title: 'Test Notification',
