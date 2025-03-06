@@ -9,6 +9,12 @@ import OpenedFromNotification from '@/components/OpenedFromNotification';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader, Plus, Share } from 'lucide-react';
 import { toast } from 'sonner';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState<number | null>(null);
@@ -138,7 +144,18 @@ function PushNotificationManager() {
       {subscription ? (
         <>
           <div className="mb-3">
-            <p>You are subscribed to push notifications.</p>
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="item-1">
+                <AccordionTrigger>
+                  🎉You are subscribed to push notifications.🎉
+                </AccordionTrigger>
+                <AccordionContent>
+                  <pre>{JSON.stringify(subscription, null, 2)}</pre>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </div>
+          <div className="mb-3">
             <Button
               variant={'destructive'}
               disabled={isBusy}
