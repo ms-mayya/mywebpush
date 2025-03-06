@@ -1,5 +1,5 @@
 import { getJoke } from '@/lib/utils';
-import { sendNotification } from 'web-push';
+import { sendNotification, PushSubscription } from 'web-push';
 
 export async function GET(request: Request) {
   const joke = await getJoke();
@@ -13,6 +13,6 @@ export async function GET(request: Request) {
       dateOfArrival: Date.now(),
       primaryKey: '2',
     },
-  });
+  } as unknown as PushSubscription);
   return Response.json(result);
 }
