@@ -1,6 +1,7 @@
 import OpenedFromNotification from '@/components/OpenedFromNotification';
 import PushNotificationManager from '@/components/push-notification-manager';
 import { ClientOnly } from '@/components/client-only';
+import { Suspense } from 'react';
 
 export default function Page() {
   return (
@@ -9,7 +10,10 @@ export default function Page() {
       <ClientOnly>
         <PushNotificationManager />
       </ClientOnly>
-      <OpenedFromNotification />
+      <Suspense>
+        {/* ⨯ useSearchParams() should be wrapped in a suspense boundary at page "/". */}
+        <OpenedFromNotification />
+      </Suspense>
     </div>
   );
 }
