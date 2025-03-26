@@ -106,11 +106,6 @@ export default function PushNotificationManager() {
           primaryKey: '2',
         },
       };
-      // const registration = await navigator.serviceWorker.ready;
-      // await registration.showNotification(
-      //   '【Client】' + notification.title,
-      //   notification
-      // );
       await sendNotification(notification);
       setMessage('');
       // setTitle('');
