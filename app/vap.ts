@@ -8,4 +8,4 @@ export const privateKey =
     ? process.env.FROG_VAPID_PRIVATE_KEY!
     : process.env.VAPID_PRIVATE_KEY!;
 
-console.log('FROG', process.env.FROG_TEST);
+console.log('FROG', process.env.NEXT_PUBLIC_FROG_TEST);
