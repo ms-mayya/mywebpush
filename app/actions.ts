@@ -7,11 +7,18 @@ import {
 } from '@/drizzle/db';
 import webpush from 'web-push';
 
-webpush.setVapidDetails(
-  'https://mywebpush.vercel.app/',
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!
-);
+const publicKey =
+  process.env.FROG_TEST === '1'
+    ? process.env.NEXT_PUBLIC_FROG_VAPID_PUBLIC_KEY!
+    : process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+const privateKey =
+  process.env.FROG_TEST === '1'
+    ? process.env.FROG_VAPID_PRIVATE_KEY!
+    : process.env.VAPID_PRIVATE_KEY!;
+
+console.log('FROG', process.env.FROG_TEST);
+
+webpush.setVapidDetails('https://mywebpush.vercel.app/', publicKey, privateKey);
 
 export async function subscribeUser(sub: PushSubscription) {
   // Save the subscription to a file
@@ -49,7 +56,7 @@ export async function sendNotification(
         );
       } catch (e) {
         console.error('Error sending push notification:', e);
-        await deleteSubscription(subscription);
+        // await deleteSubscription(subscription);
       }
     }
     return { success: true };

@@ -23,10 +23,6 @@ export const revenue = pgTable("revenue", {
 	}
 });
 
-export const subscriptions = pgTable("subscriptions", {
-	token: text().notNull(),
-});
-
 export const customers = pgTable("customers", {
 	id: uuid().default(sql`uuid_generate_v4()`).primaryKey().notNull(),
 	name: varchar({ length: 255 }).notNull(),
@@ -40,4 +36,9 @@ export const invoices = pgTable("invoices", {
 	amount: integer().notNull(),
 	status: varchar({ length: 255 }).notNull(),
 	date: date().notNull(),
+});
+
+export const subscriptions = pgTable("subscriptions", {
+	token: text().notNull(),
+	dead: integer(),
 });
