@@ -17,6 +17,8 @@ const privateKey =
     : process.env.VAPID_PRIVATE_KEY!;
 
 console.log('FROG', process.env.FROG_TEST);
+console.log('publicKey', publicKey);
+console.log('privateKey', privateKey);
 
 webpush.setVapidDetails('https://mywebpush.vercel.app/', publicKey, privateKey);
 
