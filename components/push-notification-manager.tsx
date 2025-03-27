@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/accordion';
 import { Textarea } from '@/components/ui/textarea';
 import { faker } from '@faker-js/faker';
+import { publicKey } from '@/app/vap';
 
 export default function PushNotificationManager() {
   const [isSupported, setIsSupported] = useState<number | null>(null);
@@ -78,7 +79,7 @@ export default function PushNotificationManager() {
       const pushManager = registration.pushManager;
       const sub = await pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+        applicationServerKey: publicKey,
       });
       setSubscription(sub);
       await subscribeUser(sub);

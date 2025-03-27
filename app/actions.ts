@@ -6,21 +6,9 @@ import {
   getAllSubscriptions,
 } from '@/drizzle/db';
 import webpush from 'web-push';
+import { privateKey, publicKey, subject } from './vap';
 
-const publicKey =
-  process.env.FROG_TEST === '1'
-    ? process.env.NEXT_PUBLIC_FROG_VAPID_PUBLIC_KEY!
-    : process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
-const privateKey =
-  process.env.FROG_TEST === '1'
-    ? process.env.FROG_VAPID_PRIVATE_KEY!
-    : process.env.VAPID_PRIVATE_KEY!;
-
-console.log('FROG', process.env.FROG_TEST);
-console.log('publicKey', publicKey);
-console.log('privateKey', privateKey);
-
-webpush.setVapidDetails('https://mywebpush.vercel.app/', publicKey, privateKey);
+webpush.setVapidDetails(subject, publicKey, privateKey);
 
 export async function subscribeUser(sub: PushSubscription) {
   // Save the subscription to a file
