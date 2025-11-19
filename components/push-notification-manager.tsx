@@ -29,7 +29,7 @@ export default function PushNotificationManager() {
   >(undefined);
 
   const [isBusy, setIsIsBusy] = useState(false);
-  const [message, setMessage] = useState(faker.lorem.sentence());
+  const [message, setMessage] = useState('');
   const [user, setUser] = useLocalStorage('user', faker.person.firstName());
 
   const runWithErrorHandling = async (
@@ -175,13 +175,13 @@ export default function PushNotificationManager() {
             className="my-1"
             placeholder="Your name"
             value={user}
-            onChange={(e) => setUser(e.target.value.trim())}
+            onChange={(e) => setUser(e.target.value)}
           />
           <Textarea
             className="my-1"
             placeholder="Message"
             value={message}
-            onChange={(e) => setMessage(e.target.value.trim())}
+            onChange={(e) => setMessage(e.target.value)}
           />
           <div className="flex items-center space-x-1">
             <Button
