@@ -172,7 +172,7 @@ export default function PushNotificationManager() {
           </div>
           <Input
             type="text"
-            className="my-1"
+            className="my-1 text-center"
             placeholder="Your name"
             value={user}
             onChange={(e) => setUser(e.target.value)}
