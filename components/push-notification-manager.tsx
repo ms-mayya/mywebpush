@@ -32,6 +32,15 @@ export default function PushNotificationManager() {
   const [message, setMessage] = useState('');
   const [user, setUser] = useLocalStorage('user', faker.person.firstName());
 
+  async function registerServiceWorker() {
+    const registration = await navigator.serviceWorker.register('/sw.js', {
+      scope: '/',
+      updateViaCache: 'none',
+    });
+    const sub = await registration.pushManager.getSubscription();
+    setSubscription(sub);
+  }
+
   const runWithErrorHandling = async (
     job: (...args: any[]) => Promise<any>,
     ...args: any[]
@@ -63,15 +72,6 @@ export default function PushNotificationManager() {
       }
     }
   }, []);
-
-  async function registerServiceWorker() {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-      updateViaCache: 'none',
-    });
-    const sub = await registration.pushManager.getSubscription();
-    setSubscription(sub);
-  }
 
   async function subscribeToPush() {
     runWithErrorHandling(async () => {
